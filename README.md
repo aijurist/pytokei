@@ -1,6 +1,11 @@
 # pytokei
 ---
 Pytokei is a python binding to [tokei](https://github.com/XAMPPRocky/tokei):
+Note that this is a small upgrade of the original project Pytokei. If you want to use the original package, run the command 
+```python 
+pip install pytokei
+```
+instead of pytokei_new
 
 <p align="center">
     Tokei is a program that displays statistics about your code. Tokei will show the number of files, total lines within those files and code, comments, and blanks grouped by language.
@@ -58,7 +63,7 @@ For more information about `tokei`, please visit the original repo.
 ## Installation
 
 ```bash
-pip install pytokei
+pip install pytokei_new
 ```
 
 Requires Python >= 3.7.
