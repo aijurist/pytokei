@@ -5,6 +5,7 @@ build-backend = 'maturin'
 [project]
 name = 'pytokei'
 requires-python = '>=3.7'
+version='1.0.1'
 description = 'Python bindings to tokei, the Rust library to count code quickly.'
 authors = [
     {name ='Agustin Piqueres', email = 'agustin.piqueres@gmail.com'},

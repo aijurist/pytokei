@@ -1,4 +1,7 @@
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::{self, BufRead};
+use std::path::Path;
 
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
@@ -23,13 +26,36 @@ impl PyLanguages {
         }
     }
 
-    pub fn get_statistics(&mut self, paths: Vec<String>, ignored: Vec<String>, config: &PyConfig) {
+    #[staticmethod]
+    fn read_ignore_files() -> Vec<String> {
+        let mut ignored_files = Vec::new();
+        let ignore_file = Path::new("src/ignore/.ignorerules.txt");
+
+        if ignore_file.is_file() {
+            if let Ok(file) = File::open(ignore_file) {
+                for line in io::BufReader::new(file).lines() {
+                    if let Ok(file) = line {
+                        if !file.trim().is_empty() && !file.trim().starts_with('#') {
+                            ignored_files.push(file);
+                        }
+                    }
+                }
+            }
+        }
+        ignored_files
+    }
+
+    pub fn get_statistics(&mut self, paths: Vec<String>, mut ignored: Vec<String>, config: &PyConfig) {
+        if ignored.contains(&"all".to_string()) {
+            ignored = Self::read_ignore_files();
+        }
+    
         let paths_: Vec<&str> = paths.iter().map(String::as_str).collect();
         let paths_ = paths_.as_slice();
-
+    
         let ignored_: Vec<&str> = ignored.iter().map(String::as_str).collect();
         let ignored_ = ignored_.as_slice();
-
+    
         self.languages
             .get_statistics(&paths_, &ignored_, &config.config)
     }

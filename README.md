@@ -15,7 +15,7 @@ $ python
 >>> import pytokei
 >>> from rich import print
 >>> langs = pytokei.Languages()
->>> langs.get_statistics(["."], ["tests/data", "requirements"], pytokei.Config())
+>>> langs.get_statistics(["."], ["tests/data", "requirements"], pytokei.Config()) # Use ['all'] in place of ignore to load default ignore file methods
 >>> print(langs.report_compact_plain())
 {
     'YAML': {'blanks': 6, 'code': 63, 'comments': 0, 'files': 1, 'lines': 69},
