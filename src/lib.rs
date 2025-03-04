@@ -15,7 +15,8 @@ pub mod pysort;
 pub mod pystats;
 
 #[pymodule]
-fn pytokei_new(_py: Python, m: &PyModule) -> PyResult<()> {
+fn _pytokei(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add("__package__", "pytokei_new")?;
     let version = env!("CARGO_PKG_VERSION").to_string();
     m.add("__version__", version)?;
     m.add_class::<PyConfig>().unwrap();

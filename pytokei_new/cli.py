@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
-import pytokei
+import pytokei_new
 
 app = typer.Typer()
 
@@ -130,8 +130,8 @@ def main(
     ),
 ) -> None:  # pragma: no cover
     """Pytokei Command Line Interface."""
-    langs = pytokei.Languages()
-    conf = pytokei.Config()  # Just use the default for now
+    langs = pytokei_new.Languages()
+    conf = pytokei_new.Config()  # Just use the default for now
     langs.get_statistics([str(path)], ignore_paths.split(","), conf)
     report = langs.report_compact_plain()
 

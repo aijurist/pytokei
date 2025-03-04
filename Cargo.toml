@@ -1,6 +1,6 @@
 [package]
 name = "pytokei_new"
-version = "0.2.1"
+version = "1.0.11"
 edition = "2021"
 license = "MIT"
 readme = "README.md"
@@ -12,9 +12,10 @@ pyo3 = {version = "0.17.1", features = ["extension-module", "abi3-py37"]}
 tokei = "12.1"
 
 [lib]
-name = "pytokei_new"
+name = "_pytokei"
 # "cdylib" is necessary to produce a shared library for Python to import from.
 crate-type = ["cdylib"]
 
 [package.metadata.maturin]
 name = "pytokei_new"
+resources = ["data/ignore/.ignorerules.txt"]

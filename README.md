@@ -17,10 +17,10 @@ This wrapper allows to obtain the same reports directly from python.
 
 ```python
 $ python
->>> import pytokei
+>>> import pytokei_new
 >>> from rich import print
->>> langs = pytokei.Languages()
->>> langs.get_statistics(["."], ["tests/data", "requirements"], pytokei.Config()) # Use ['all'] in place of ignore to load default ignore file methods
+>>> langs = pytokei_new.Languages()
+>>> langs.get_statistics(["."], ["tests/data", "requirements"], pytokei_new.Config()) # Use ['all'] in place of ignore to load default ignore file methods
 >>> print(langs.report_compact_plain())
 {
     'YAML': {'blanks': 6, 'code': 63, 'comments': 0, 'files': 1, 'lines': 69},

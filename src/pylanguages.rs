@@ -15,6 +15,7 @@ use crate::pylanguage_type::PyLanguageType;
 #[pyclass(name = "Languages")]
 pub struct PyLanguages {
     pub languages: Languages,
+    pub ignored_files: Vec<String>
 }
 
 #[pymethods]
@@ -23,41 +24,60 @@ impl PyLanguages {
     pub fn new() -> Self {
         PyLanguages {
             languages: Languages::new(),
+            ignored_files: Vec::new()
         }
     }
-
-    #[staticmethod]
-    fn read_ignore_files() -> Vec<String> {
-        let mut ignored_files = Vec::new();
-        let ignore_file = Path::new("src/ignore/.ignorerules.txt");
-
-        if ignore_file.is_file() {
-            if let Ok(file) = File::open(ignore_file) {
-                for line in io::BufReader::new(file).lines() {
-                    if let Ok(file) = line {
-                        if !file.trim().is_empty() && !file.trim().starts_with('#') {
-                            ignored_files.push(file);
+    #[getter]
+    fn ignored_files(&self) -> Vec<String> {
+        self.ignored_files.clone()  // Expose ignored files to Python
+    }
+    
+    pub fn get_statistics(&mut self, paths: Vec<String>, mut ignored: Vec<String>, config: &PyConfig) -> PyResult<()> {
+        if ignored.contains(&"all".to_string()) {
+            Python::with_gil(|py| {
+                // Get the package directory from Python
+                let package = PyModule::import(py, "pytokei_new")?;
+                let package_dir = package.getattr("__file__")?.to_string();
+                
+                // Construct the path to the ignore file
+                let ignore_path = Path::new(&package_dir)
+                    .parent()  // Move to pytokei_new directory
+                    .expect("Failed to get package dir")
+                    .join("data")  // Add data/
+                    .join("ignore")  // Add ignore/
+                    .join(".ignorerules.txt");  // Add .ignorerules.txt
+    
+                // Debug: Print the resolved ignore file path
+                // println!("Resolved ignore file path: {:?}", ignore_path);
+    
+                if ignore_path.is_file() {
+                    let file = File::open(&ignore_path)
+                        .map_err(|e| PyErr::new::<PyValueError, _>(format!("Failed to open ignore file: {}", e)))?;
+    
+                    for line in io::BufReader::new(file).lines() {
+                        let line = line.map_err(|e| PyErr::new::<PyValueError, _>(format!("Error reading line: {}", e)))?;
+                        if !line.trim().is_empty() && !line.trim().starts_with('#') {
+                            ignored.push(line);  // Add ignore patterns to the list
                         }
                     }
+                } else {
+                    println!("Ignore file not found at: {:?}", ignore_path);  // Debug: File missing
                 }
-            }
-        }
-        ignored_files
-    }
-
-    pub fn get_statistics(&mut self, paths: Vec<String>, mut ignored: Vec<String>, config: &PyConfig) {
-        if ignored.contains(&"all".to_string()) {
-            ignored = Self::read_ignore_files();
+                Ok::<(), PyErr>(())
+            })?
         }
     
         let paths_: Vec<&str> = paths.iter().map(String::as_str).collect();
-        let paths_ = paths_.as_slice();
-    
         let ignored_: Vec<&str> = ignored.iter().map(String::as_str).collect();
-        let ignored_ = ignored_.as_slice();
+    
+        // Debug: Print paths and ignore patterns
+        // println!("Paths to scan: {:?}", paths_);
+        // println!("Ignore patterns: {:?}", ignored_);
     
         self.languages
-            .get_statistics(&paths_, &ignored_, &config.config)
+            .get_statistics(&paths_, &ignored_, &config.config);
+    
+        Ok(())
     }
 
     pub fn total(&self) -> PyLanguage {
